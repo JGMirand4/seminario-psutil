@@ -67,14 +67,17 @@ def fase_memoria(segundos, max_mb, passo_mb=50):
 def fase_disco(segundos, pasta=None, arquivo_mb=256):
     """Escreve (com fsync) e lê um arquivo temporário em laço; apaga ao final."""
     caminho = os.path.join(pasta or tempfile.gettempdir(), "carga_psutil.bin")
+    bloco = os.urandom(MB)        # gerado uma vez: não queremos carga de CPU nesta fase
     fim = time.time() + segundos
     try:
         while time.time() < fim:
             with open(caminho, "wb") as f:
                 for _ in range(arquivo_mb):
-                    f.write(os.urandom(MB))
+                    f.write(bloco)
                 f.flush()
                 os.fsync(f.fileno())
+                if hasattr(os, "posix_fadvise"):   # Linux: descarta o cache para a leitura ir ao disco
+                    os.posix_fadvise(f.fileno(), 0, 0, os.POSIX_FADV_DONTNEED)
             with open(caminho, "rb") as f:
                 while f.read(8 * MB):
                     pass

@@ -57,12 +57,13 @@ print("Swap:", psutil.swap_memory())  # sin/sout são cumulativos e sem sentido 
 # MOSTRAR: bytes escritos/lidos subindo durante a cópia de um arquivo grande.
 # DIZER:   "Também é contador acumulado: a taxa é a diferença dividida pelo intervalo."
 print("Uso de '/':", psutil.disk_usage(os.path.abspath(os.sep)))
+bloco = os.urandom(MB)            # gerado fora da medição: o tempo medido é o do disco
 antes = psutil.disk_io_counters()
 t0 = time.perf_counter()
 caminho = os.path.join(tempfile.gettempdir(), "demo_psutil.bin")
 with open(caminho, "wb") as f:
     for _ in range(200):          # 200 MB
-        f.write(os.urandom(MB))
+        f.write(bloco)
     f.flush()
     os.fsync(f.fileno())
 dt = time.perf_counter() - t0
@@ -95,7 +96,10 @@ print("Liberado:", f"{p.memory_info().rss / MB:.0f} MB")
 # MOSTRAR: os 5 maiores consumidores de CPU agora.
 # DIZER:   "process_iter com lista de atributos é a forma barata de varrer processos."
 for proc in psutil.process_iter(["pid", "name"]):
-    proc.cpu_percent(None)        # primeira leitura de cada objeto: descartada
+    try:
+        proc.cpu_percent(None)    # primeira leitura de cada objeto: descartada
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
+        pass
 time.sleep(1)
 linhas = []
 for proc in psutil.process_iter(["pid", "name"]):

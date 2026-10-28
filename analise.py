@@ -174,7 +174,9 @@ if ARQ_B is None:
 else:
     def prepara(arq):
         x = carregar(arq)
-        ini = transiente_regressao(x, janela=min(JANELA, len(x) // 2)) or truncagem(x)
+        ini = transiente_regressao(x, janela=min(JANELA, len(x) // 2))
+        if ini is None:           # mesma regra do bloco 2 (0 é um resultado válido)
+            ini = truncagem(x)
         x = x[ini:]
         lag_, _, _ = lag_nao_significativo(x)
         return lotes(x, lag_)[0]

@@ -52,6 +52,7 @@ Aponte o início instável, o patamar e a volta ao repouso.
 ## Cuidados
 - A fase de memória aloca no máximo 50% da memória disponível (e `--max-mb`). Ajuste se a máquina tiver pouca RAM.
 - A fase de disco escreve arquivos de 256 MB na pasta temporária e apaga ao final.
+- A fase de disco gera o bloco aleatório uma só vez (sem carga de CPU) e, no Linux, descarta o cache após escrever, para `disco_leit_mbs` mostrar leitura real.
 - Sensores (`sensors_*`) podem não existir ou vir vazios, dependendo do sistema; o bloco 9 da demonstração 1 já trata isso.
 - No Windows, `sin` e `sout` do swap não têm significado, e a carga média é emulada.
 - Testei os scripts em Linux. Ensaie na máquina da apresentação, principalmente `coletor.py` e `carga.py`.
