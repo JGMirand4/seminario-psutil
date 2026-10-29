@@ -1,16 +1,4 @@
 #!/usr/bin/env python3
-"""Coletor de métricas com psutil: um monitor de AMOSTRAGEM e em LOTE (vocabulário de Jain).
-
-Lê CPU, memória, disco e rede a cada INTERVALO segundos e grava uma linha por amostra
-em um CSV. As taxas de disco e rede são calculadas pela DIFERENÇA entre leituras de
-contadores acumulados. A coluna 'fase' vem do arquivo fase.txt, que o carga.py atualiza,
-e as colunas 'coletor_*' medem o overhead do próprio coletor.
-
-Uso:
-    python coletor.py                       # coleta até Ctrl+C
-    python coletor.py --intervalo 0.1       # compare o overhead com 1 s e 0,1 s
-    python coletor.py --duracao 720 --saida coleta_A.csv
-"""
 import argparse
 import csv
 import time
@@ -25,7 +13,6 @@ COLUNAS = ["t_s", "hora", "fase", "cpu_pct", "mem_pct", "mem_disp_mb", "swap_pct
 
 
 def ler_fase(caminho):
-    """Fase atual escrita pelo carga.py; '-' se não houver arquivo."""
     try:
         with open(caminho, encoding="utf-8") as f:
             return f.read().strip() or "-"
@@ -34,7 +21,6 @@ def ler_fase(caminho):
 
 
 def contadores():
-    """Disco e rede acumulados; disk_io_counters pode ser None em alguns ambientes."""
     d = psutil.disk_io_counters()
     n = psutil.net_io_counters()
     return (d.read_bytes if d else 0, d.write_bytes if d else 0, n.bytes_sent, n.bytes_recv)
@@ -50,7 +36,7 @@ def main():
     args = ap.parse_args()
 
     eu = psutil.Process()
-    psutil.cpu_percent(None)          # primeira leitura é inútil: descartada aqui
+    psutil.cpu_percent(None)
     eu.cpu_percent(None)
     ant = contadores()
     inicio = prev = time.perf_counter()
@@ -63,7 +49,6 @@ def main():
         try:
             while True:
                 i += 1
-                # agenda pelo relógio de início para o intervalo não acumular atraso
                 time.sleep(max(0.0, inicio + i * args.intervalo - time.perf_counter()))
                 agora = time.perf_counter()
                 dt, prev = agora - prev, agora
@@ -87,7 +72,7 @@ def main():
                 ]
                 ant = atual
                 w.writerow(linha)
-                f.flush()             # o CSV "cresce" na tela durante a demonstração
+                f.flush()
                 if not args.silencioso:
                     print(f"t={linha[0]:7.1f}s  fase={linha[2]:<8} cpu={linha[3]:5.1f}%  "
                           f"mem_disp={linha[5]:8.1f} MB  disco_esc={linha[8]:7.2f} MB/s  "

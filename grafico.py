@@ -1,11 +1,4 @@
 #!/usr/bin/env python3
-"""Gráfico da série temporal do CSV do coletor, com as fases sombreadas.
-
-Uso:
-    python grafico.py coleta.csv                  # abre a janela
-    python grafico.py coleta.csv --salvar serie.png
-Aponte na tela: o início instável, o patamar e a volta ao repouso.
-"""
 import argparse
 
 import matplotlib
@@ -28,7 +21,6 @@ def main():
 
     df = pd.read_csv(a.csv)
     fig, eixos = plt.subplots(len(PAINEIS), 1, figsize=(12, 8), sharex=True)
-    # blocos consecutivos da mesma fase
     grupo = (df["fase"] != df["fase"].shift()).cumsum()
     for ax, (col, rotulo) in zip(eixos, PAINEIS):
         for _, g in df.groupby(grupo):

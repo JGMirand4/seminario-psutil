@@ -1,10 +1,4 @@
 #!/usr/bin/env python3
-"""Gera CSVs SIMULADOS (não medidos) no mesmo formato do coletor, para ensaiar a
-demonstração 3 e servir de plano B. A CPU tem um transiente no início de cada fase e
-ruído autocorrelacionado (AR(1)), como no capítulo 10. Cenário B usa um patamar menor.
-
-Uso: python gerar_exemplo.py        # cria exemplo_A.csv e exemplo_B.csv
-"""
 import numpy as np
 import pandas as pd
 
@@ -18,7 +12,7 @@ def gerar(nivel_cpu, semente):
         alvo = nivel_cpu if fase == "cpu" else nivel
         base = linhas[-1]["cpu_pct"] if linhas else 3.0
         for k in range(dur):
-            ruido = 0.7 * ruido + rng.normal(0, 2.5)           # AR(1): observações vizinhas parecidas
+            ruido = 0.7 * ruido + rng.normal(0, 2.5)
             cpu = alvo + (base - alvo) * np.exp(-k / 8) + ruido
             mem = mem - 25 if fase == "memoria" else mem + (8000 - mem) * 0.1
             linhas.append({"t_s": t, "hora": "", "fase": fase, "cpu_pct": round(float(np.clip(cpu, 0, 100)), 2),
