@@ -14,14 +14,14 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-ARQ_A = "coleta_A.csv"    # cenário A
-ARQ_B = None              # cenário B (bloco 7); ex.: "coleta_B.csv"
+ARQ_A = os.environ.get("ARQ_A", "coleta_A.csv")    # cenário A
+ARQ_B = os.environ.get("ARQ_B")    # cenário B (bloco 6); ex.: "coleta_B.csv"
 METRICA = "cpu_pct"       # coluna analisada
 FASE = "cpu"              # fase analisada (None = série inteira)
 JANELA = 20               # média móvel; o livro cita 50 para séries longas
 ALFA = 0.05               # 95% de confiança
 PRECISAO_REL = 0.09       # o livro usa 0,09 para uma precisão relativa de 0,10
-MOSTRAR = True
+MOSTRAR = os.environ.get("MOSTRAR", "1") != "0"   # MOSTRAR=0 só salva as figuras
 os.makedirs("figuras", exist_ok=True)
 
 

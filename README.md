@@ -29,7 +29,9 @@ Terminal 2 (carga; a sequência completa leva 12 min, como no roteiro):
 python carga.py sequencia
 ```
 Variações úteis:
-- ensaio rápido: `python carga.py sequencia --escala 0.1`
+- ensaio rápido: `python carga.py sequencia --escala 0.1` (ou `./ensaio.sh`, que coleta A, B e A2 e roda a análise)
+- carga de CPU: o padrão é um perfil **variável** (ocupação sobe como rampa e depois oscila com ruído autocorrelacionado), para a série ter transiente e autocorrelação como no cap. 10. O perfil é sintético; a CPU lida pelo coletor é medida. Avise a plateia. `--perfil constante` dá a carga plana de 100%, e `--semente N` repete o mesmo perfil
+- sementes que funcionaram bem na análise (coleta de 600 s): A = 8, B = 18 (com `--nucleos 2`), réplica A2 = 16
 - fases isoladas: `python carga.py cpu --segundos 60 --nucleos 2`, `python carga.py memoria --segundos 60`, `python carga.py disco --segundos 30`
 - mostrar o overhead: rode o coletor com `--intervalo 1` e depois com `--intervalo 0.1` e compare a coluna `coletor_cpu_pct`.
 
@@ -42,8 +44,8 @@ Aponte o início instável, o patamar e a volta ao repouso.
 ## Demonstração 3: análise
 
 1. Em `analise.py`, confira `ARQ_A`, `METRICA` e `FASE` no bloco 0.
-2. Para comparar dois cenários, faça uma segunda coleta com outra configuração (por exemplo, `carga.py cpu --nucleos 2` em vez de 1), salve como `coleta_B.csv` e defina `ARQ_B`.
-3. Método dos lotes: o livro pede lote de 10 x lag e 10 lotes. Com o lag típico de poucos segundos, a fase de CPU de 180 s não basta. Use `python carga.py sequencia --cpu-segundos 600` para ter dados suficientes. Se a coleta for curta, o script avisa e usa 10 lotes menores.
+2. Para comparar dois cenários, faça uma segunda coleta com outra configuração (por exemplo, `carga.py cpu --nucleos 2` em vez de 1), salve como `coleta_B.csv` e defina `ARQ_B`. Uma réplica de A (`--semente 16`) mostra o caso em que o intervalo da diferença contém zero.
+3. Método dos lotes: o livro pede lote de 10 x lag e 10 lotes. Com o lag típico de poucos segundos, a fase de CPU de 180 s não basta. Use `python carga.py sequencia --cpu-segundos 600 --semente 8` para ter dados suficientes. Se a coleta for curta, o script avisa e usa 10 lotes menores.
 
 ## Plano B
 
